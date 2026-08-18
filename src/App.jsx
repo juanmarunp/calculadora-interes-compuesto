@@ -1,6 +1,80 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { TrendingUp, Wallet, PiggyBank, ArrowRight } from "lucide-react";
+import { TrendingUp, Wallet, PiggyBank, ArrowRight, Mail } from "lucide-react";
+
+const MAILERLITE_ACTION = "https://assets.mailerlite.com/jsonp/2583401/forms/196167239621150327/subscribe";
+
+function LineaLedgerEmail() {
+  const [status, setStatus] = useState("idle"); // idle | submitting | success
+
+  return (
+    <div className="bg-white p-7 rounded-sm" style={{ border: "1px solid #D8D6CE" }}>
+      <div className="flex items-start gap-3 mb-4">
+        <Mail size={18} style={{ color: "#C9A227", marginTop: 3, flexShrink: 0 }} />
+        <div>
+          <p
+            className="text-xs uppercase tracking-widest mb-1"
+            style={{ color: "#6B6A5F", letterSpacing: "0.12em" }}
+          >
+            Última línea del libro
+          </p>
+          <h3
+            className="text-xl mb-1"
+            style={{ fontFamily: "'Fraunces', serif", color: "#1A1A17", fontWeight: 500 }}
+          >
+            Envíame mi plan de ahorro
+          </h3>
+          <p className="text-sm" style={{ color: "#5C5B50" }}>
+            Te mandamos un resumen con tus cifras y recordatorios para seguir tu meta. Sin spam.
+          </p>
+        </div>
+      </div>
+
+      {status === "success" ? (
+        <p className="text-sm font-medium" style={{ color: "#2D6E5E" }}>
+          Listo — revisa tu correo para confirmar la suscripción.
+        </p>
+      ) : (
+        <form
+          action={MAILERLITE_ACTION}
+          method="post"
+          target="ml-hidden-frame"
+          onSubmit={() => setStatus("submitting")}
+          className="flex flex-col sm:flex-row gap-3"
+        >
+          <input
+            type="email"
+            name="fields[email]"
+            required
+            placeholder="tu@email.com"
+            className="flex-1 px-4 py-3 rounded-sm text-sm outline-none"
+            style={{
+              border: "1px solid #D8D6CE",
+              fontFamily: "'IBM Plex Mono', monospace",
+              color: "#1A1A17",
+              backgroundColor: "#FBFAF7",
+            }}
+          />
+          <input type="hidden" name="ml-submit" value="1" />
+          <button
+            type="submit"
+            disabled={status === "submitting"}
+            className="px-5 py-3 rounded-sm text-sm font-semibold whitespace-nowrap"
+            style={{ backgroundColor: "#C9A227", color: "#1A1A17" }}
+          >
+            {status === "submitting" ? "Enviando..." : "Enviarme mi plan"}
+          </button>
+        </form>
+      )}
+
+      <iframe
+        name="ml-hidden-frame"
+        title="mailerlite-hidden-frame"
+        style={{ display: "none" }}
+      />
+    </div>
+  );
+}
 
 const FONT_IMPORT = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
@@ -289,6 +363,9 @@ export default function CalculadoraInteresCompuesto() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+
+            {/* Captura de email */}
+            <LineaLedgerEmail />
 
             {/* CTA afiliado */}
             <div
